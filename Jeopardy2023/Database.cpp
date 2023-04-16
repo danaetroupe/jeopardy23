@@ -1,16 +1,15 @@
-#include "Database.h"
+#include "database.h"
 using namespace std;
 
 Database::Database() {
 	connection = sqlite3_open(file, &DB);
-    if (connection) {
+    if (connection != SQLITE_OK) {
         cerr << "Error open DB: " << sqlite3_errmsg(DB) << endl;
     }
     else {
-        cout << "Opened Database Successfully!" << endl;
-        //int count;
-        int ex = sqlite3_exec(DB, "SELECT COUNT(*) FROM Category;", callback, 0, NULL);
+        getCategories();
     }
+    
 };
 
 Database::~Database() {
@@ -21,12 +20,18 @@ tuple<string, string> Database::getQuestion(int category, int difficulty) {
     return tuple<string, string>{"0", "0"};
 }
 
-int Database::callback(void* data, int columns, char** text, char** columnName) {
-    for (int i = 0; i < columns; i++) {
-        cout << text[i] << endl;
+void Database::getCategories() {
+    string sql = "SELECT id, name from Category ORDER BY random();";
+    sqlite3_stmt* stmt;
+    sqlite3_prepare_v2(DB, sql.c_str(), sql.length(), &stmt, NULL);
+    for (int i = 0; i < 6; i++) {
+        int success = sqlite3_step(stmt);
+        categoryID[i] = sqlite3_column_int(stmt, 0);
+        categoryName[i] = (const char*)(sqlite3_column_text(stmt, 1));
+        cout << categoryID[i] << ": " << categoryName[i] << endl;
     }
-    return 0;
-};
+}
+
 
 
 

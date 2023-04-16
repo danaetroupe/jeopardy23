@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "window.h"
 
 Window::Window(const char* name) {
     gWindow = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);

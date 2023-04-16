@@ -6,7 +6,7 @@ using namespace std;
 class Rectangle
 {
 public:
-	Rectangle(SDL_Renderer* gRenderer, int8_t color[4], int x, int y, int width, int height);
+	Rectangle(SDL_Renderer* gRenderer, int color[4], int x, int y, int width, int height);
 	~Rectangle();
 	
 	void writeText(string text);

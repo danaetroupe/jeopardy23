@@ -1,7 +1,7 @@
 #pragma once
 #include<iostream>
-#include<SDL_ttf.h>
-#include"Texture.h"
+#include<SDL.h>
+#include<SDL_image.h>
 using namespace std;
 
 class Window
