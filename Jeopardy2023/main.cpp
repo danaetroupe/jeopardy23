@@ -63,10 +63,10 @@ void showRectangles(SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT, s
     }
    
     SDL_RenderPresent(render);
+}
 
     
-}
-    
+
 int main(int argc, char* args[]) {
     init();
 
