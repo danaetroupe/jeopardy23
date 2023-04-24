@@ -15,12 +15,11 @@ class Database {
 		~Database();
 
 		string categoryName[6];
+		int categoryID[6];
 	private:
 		const char* file = "C:/Users/danae/Desktop/Programming/databases/Jeopardy2023/jeopardy.db";
 		int connection = 0;
 		sqlite3* DB;
-
-		int categoryID[6];
 	
 		void getCategories();
 };

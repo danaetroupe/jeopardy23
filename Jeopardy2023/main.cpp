@@ -3,6 +3,8 @@
 #include "rectangle.h"
 #include "texture.h"
 
+bool CLICKRECT[6][5];
+
 bool init() {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) { 
         cout << "SDL could not initialize! SDL_Error:" << SDL_GetError() << endl; 
@@ -13,11 +15,16 @@ bool init() {
         cout << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << endl;
         return false;
     }
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 5; j++) {
+            CLICKRECT[i][j] = false;
+        }
+    }
     return true;
 }
 
 bool showQuestion(string question, string answer) {
-
+    return true;
 }
 
 
@@ -53,7 +60,8 @@ void showRectangles(SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT, s
     string dollarText[5] = {"$200", "$400", "$600", "$800", "$1000"};
     for (int i = 0; i < 6; i ++) {
         for (int z = 0; z < 5; z++) {
-            dollar.loadFromRenderedText(dollarText[z]);
+            if (CLICKRECT[i][z] == false) { dollar.loadFromRenderedText(dollarText[z]); }
+            else { dollar.loadFromRenderedText(" "); }
             int width = cat.getWidth();
             int height = cat.getHeight();
             int x = ((rectWidth) - width) / 2 + (iterateX * i + 2);
@@ -65,6 +73,9 @@ void showRectangles(SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT, s
     SDL_RenderPresent(render);
 }
 
+bool showQuestion(string question, string answer) {
+    //
+}
     
 
 int main(int argc, char* args[]) {
@@ -72,7 +83,6 @@ int main(int argc, char* args[]) {
 
     Database data; 
     int scores[3] = { 0, 0, 0 };
-    bool clickRect[6][5];
 
     // Start Window
     Window wdw("Test");
@@ -84,28 +94,31 @@ int main(int argc, char* args[]) {
     int SCREEN_WIDTH = wdw.getWidth();
     int SCREEN_HEIGHT = wdw.getHeight();
     showRectangles(render, SCREEN_WIDTH, SCREEN_HEIGHT, data.categoryName);
-    
+    int difficulties[5] = { 1, 3, 5, 7, 9 };
     bool quit = false;
     SDL_Event e;
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) { quit = true; }
-        }
-        if (e.type == SDL_MOUSEBUTTONDOWN) {
-            int x, y;
-            int iterateX = SCREEN_WIDTH / 6;
-            int iterateY = SCREEN_HEIGHT / 6;
-            SDL_GetMouseState(&x, &y);
-            int xr = SCREEN_WIDTH % x;
-            int h = (x - xr) / (iterateX);
-            int yr = SCREEN_HEIGHT % y;
-            int v = ((y - yr) / (iterateY)) - 1;
-            if (xr <= iterateX && yr <= iterateY) {
-                clickRect[h][v] = true;
-                tuple<string, string> info = data.getQuestion(h, v);
-                showRectangles(render, SCREEN_WIDTH, SCREEN_HEIGHT, data.categoryName);
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                int iterateX = SCREEN_WIDTH / 6;
+                int iterateY = SCREEN_HEIGHT / 6;
+                SDL_GetMouseState(&x, &y);
+                int h = x / iterateX;
+                cout << h << endl;
+                int v = y / iterateY - 1;
+                cout << v << endl;
+                if (v >= 0) {
+                    CLICKRECT[h][v] = true;
+                    int category = data.categoryID[h];
+                    int difficulty = difficulties[v];
+                    tuple<string, string> info = data.getQuestion(category, difficulty);
+                    showRectangles(render, SCREEN_WIDTH, SCREEN_HEIGHT, data.categoryName);
+                    cout << get<0>(info) << endl;
+                    cout << "Answer: " << get<1>(info) << endl;
+                }
             }
-
         }
     }
 	return 0;
