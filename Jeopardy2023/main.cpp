@@ -74,7 +74,13 @@ void showRectangles(SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT, s
 }
 
 bool showQuestion(string question, string answer) {
-    //
+    // render question in big letters for 1/2 of screen
+    // timer in top right corner counting down from 30 seconds
+    // render button that says "Show Answer"
+    // if timer = 0 OR button pressed DISPLAY ANSWER in place of button
+    // new button appears with a check or X 
+    // if check button pressed, return true
+    // if x button pressed, return false
 }
     
 
@@ -106,17 +112,22 @@ int main(int argc, char* args[]) {
                 int iterateY = SCREEN_HEIGHT / 6;
                 SDL_GetMouseState(&x, &y);
                 int h = x / iterateX;
-                cout << h << endl;
                 int v = y / iterateY - 1;
-                cout << v << endl;
-                if (v >= 0) {
+                if (v >= 0 and CLICKRECT[h][v] == false) {
+                    // keep track of times clicked. when it reaches 30, ENDGAME (new func?)
                     CLICKRECT[h][v] = true;
                     int category = data.categoryID[h];
                     int difficulty = difficulties[v];
                     tuple<string, string> info = data.getQuestion(category, difficulty);
+
+                    /* 
+                    bool correct = showQuestion(get<0>(info), get<1>(info))
+                    if (correct) {
+                        // award points to player
+                    }
+                    */
                     showRectangles(render, SCREEN_WIDTH, SCREEN_HEIGHT, data.categoryName);
-                    cout << get<0>(info) << endl;
-                    cout << "Answer: " << get<1>(info) << endl;
+                    
                 }
             }
         }
