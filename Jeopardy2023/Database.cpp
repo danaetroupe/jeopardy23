@@ -24,14 +24,12 @@ tuple<string, string> Database::getQuestion(int category, int difficulty) {
     ostringstream oss;
     oss << "SELECT question, answer FROM QuestionAnswer WHERE cat_id == " << category << " AND difficulty == " << difficulty;
     string sql = oss.str();
-    cout << "sql string: " << sql << endl;
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(DB, sql.c_str(), sql.length(), &stmt, NULL);
 
     int success = sqlite3_step(stmt);
     question = (const char*)(sqlite3_column_text(stmt, 0));
     answer = (const char*)(sqlite3_column_text(stmt, 1));
-    cout << question << answer << endl;
     return tuple<string, string>{question, answer};
 }
 

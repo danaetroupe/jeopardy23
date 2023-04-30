@@ -1,5 +1,2 @@
-﻿  database.cpp
-C:\Users\danae\Desktop\Programming\databases\Jeopardy2023\Jeopardy2023\database.cpp(29,66): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\danae\Desktop\Programming\databases\Jeopardy2023\Jeopardy2023\database.cpp(41,66): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\danae\Desktop\Programming\databases\Jeopardy2023\Jeopardy2023\database.cpp(51,77): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+﻿  window.cpp
   Jeopardy2023.vcxproj -> C:\Users\danae\Desktop\Programming\databases\Jeopardy2023\x64\Debug\Jeopardy2023.exe

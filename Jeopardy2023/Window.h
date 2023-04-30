@@ -17,8 +17,8 @@ private:
 	SDL_Window* gWindow = NULL;
 	SDL_Renderer* gRenderer = NULL;
 
-	const int SCREEN_WIDTH = 980;
-	const int SCREEN_HEIGHT = 540;
+	int SCREEN_WIDTH = 980;
+	int SCREEN_HEIGHT = 540;
 
 };
 

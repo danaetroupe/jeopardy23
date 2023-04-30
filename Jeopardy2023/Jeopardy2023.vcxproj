@@ -108,6 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,8 +133,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="text.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="rectangle.h" />
+    <ClInclude Include="timer.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="texture.h" />
@@ -142,8 +145,10 @@
     <ResourceCompile Include="Jeopardy2023.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="text.cpp" />
     <ClCompile Include="database.cpp" />
     <ClCompile Include="rectangle.cpp" />
+    <ClCompile Include="timer.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="texture.cpp" />
