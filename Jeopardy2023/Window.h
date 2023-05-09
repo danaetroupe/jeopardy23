@@ -7,7 +7,7 @@ using namespace std;
 class Window
 {
 public:
-	Window(const char* name);
+	Window(const char* name, int width, int height, int x, int y);
 	~Window();
 
 	SDL_Renderer* getRenderer();
@@ -17,8 +17,8 @@ private:
 	SDL_Window* gWindow = NULL;
 	SDL_Renderer* gRenderer = NULL;
 
-	int SCREEN_WIDTH = 980;
-	int SCREEN_HEIGHT = 540;
+	int SCREEN_WIDTH = 1920;
+	int SCREEN_HEIGHT = 1080;
 
 };
 

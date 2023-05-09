@@ -9,6 +9,8 @@ public:
 	Rectangle(SDL_Renderer* gRenderer, int color[3], int x, int y, int width, int height);
 	~Rectangle();
 	
+	bool checkCoords(int x, int y);
+	
 	void writeText(string text);
 	void setButton(bool state);
 private:

@@ -6,7 +6,7 @@
 #include "timer.h"
 
 bool _CLICKRECT[6][5];
-int _PLAYERS = 1;
+// Font Paths
 const string _NORMAL = "C:/Users/danae/Desktop/Programming/databases/Jeopardy2023/assets/Normal.ttf";
 const string _BOLD = "C:/Users/danae/Desktop/Programming/databases/Jeopardy2023/assets/Bold.ttf";
 //Text Colors
@@ -35,11 +35,41 @@ bool init() {
     return true;
 }
 
-bool showLoadingScreen(SDL_Renderer* render, int width, int height) {
+int showLoadingScreen(SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
     Texture tx(render, "../assets/LoadingScreen.png");
-    tx.render(0, 0);
+    tx.loadImage();
+    tx.render(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     // Render player selection Text
-    return true;
+    int x1 = SCREEN_WIDTH / 5;
+    int x2 = 3 * SCREEN_WIDTH / 5;
+    int y = SCREEN_HEIGHT - 150;
+    int width = SCREEN_WIDTH / 5;
+    int height = 100;
+    Rectangle yesRect(render, blue, x1, y, width, height);
+    Rectangle noRect(render, blue, x2, y, width, height);
+    Text select(render, _NORMAL, white, 40, width);
+    select.loadFromRenderedText("1 Player: S");
+
+    select.render(x1, y);
+    select.loadFromRenderedText("2 Players: S & K");
+    select.render(x2, y);
+    SDL_RenderPresent(render);
+
+    SDL_Event e;
+    while (true) {
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (yesRect.checkCoords(x, y)) {
+                    return 1;
+                }
+                else if (noRect.checkCoords(x, y)) {
+                    return 2;
+                }
+            }
+        }
+    }
 }
 
 void showRectangles(SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT, string categoryName[6]) {
@@ -104,7 +134,7 @@ bool showAnswer(string answer, SDL_Renderer* render, const int SCREEN_WIDTH, con
     answerDisplay.render((SCREEN_WIDTH - answerDisplay.getWidth()) / 2, 100, answerDisplay.getWidth(), answerDisplay.getHeight());
     SDL_RenderPresent(render);
 
-    Timer tempTime(3);
+    Timer tempTime(1);
     tempTime.start();
     while (tempTime.getTime() != 0) {
         continue;
@@ -139,34 +169,34 @@ bool showAnswer(string answer, SDL_Renderer* render, const int SCREEN_WIDTH, con
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                if (x >= yesX && x <= yesX + width && y >= yesY && y <= yesY + height) {
+                if (yesRect.checkCoords(x, y)) {
                     return true;
                 }
-                else if (x >= noX && x <= noX + width && y >= yesY && y <= yesY + height) {
+                else if (noRect.checkCoords(x,y)) {
                     return false;
                 }
             }
         }
     }
-}
+} 
 
-bool showQuestion(string question, string answer, SDL_Renderer* render, const int SCREEN_WIDTH, const int SCREEN_HEIGHT) {
+tuple<bool, int> showQuestion(string question, string answer, SDL_Renderer* render, const int SCREEN_WIDTH, const int SCREEN_HEIGHT, int players) {
     SDL_RenderClear(render);
     // render question in big letters for 1/2 of screen
     Text questionText(render, _BOLD, { 211, 157, 74 }, 64, SCREEN_WIDTH - 50);
     questionText.loadFromRenderedText(question);
     questionText.render(25, 50, SCREEN_WIDTH, questionText.getHeight());
 
-    Timer timer(30);
-    int currentTime = 0;
+    Timer timer(15);
     timer.start();
-    Uint32 time = timer.getTime();
+    Uint32 currentTime = timer.getTime();
     bool clicked = false;
     SDL_Event e;
-    while ((time != 0) && (clicked == false)) {
+    int player = 0;
+    while ((currentTime != 0) && (clicked == false)) {
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_KEYDOWN) {
-               if (e.key.keysym.sym == SDLK_SPACE) {
+               if (e.key.keysym.sym == SDLK_s || (e.key.keysym.sym == SDLK_k && players == 2)) {
                    clicked = true;
                    timer.stop();
                    Text click(render, _NORMAL, { 255, 255, 255 }, 48, SCREEN_WIDTH - 50);
@@ -176,6 +206,17 @@ bool showQuestion(string question, string answer, SDL_Renderer* render, const in
                    int x = (SCREEN_WIDTH - clickWidth) / 2;
                    click.render(x, questionText.getHeight() + 100, clickWidth, clickHeight);
                    SDL_RenderPresent(render);
+
+                   if (e.key.keysym.sym == SDLK_k) { player = 1; }
+
+                   while (true) {
+                       while (SDL_PollEvent(&e) != 0) {
+                           if (e.type == SDL_MOUSEBUTTONDOWN) {
+                               bool correct = showAnswer(answer, render, SCREEN_WIDTH, SCREEN_HEIGHT);
+                               return { correct, player };
+                           }
+                       }
+                   }
                 }
             }
         }
@@ -184,24 +225,50 @@ bool showQuestion(string question, string answer, SDL_Renderer* render, const in
             SDL_RenderClear(render);
             currentTime = newTime;
             questionText.render(25, 50, SCREEN_WIDTH, questionText.getHeight());
-            showTime(currentTime, render, SCREEN_WIDTH, SCREEN_HEIGHT);
-        }
-    }
-    
-    while (true) {
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_MOUSEBUTTONDOWN) {
-                bool correct = showAnswer(answer, render, SCREEN_WIDTH, SCREEN_HEIGHT);
-                return correct;
+            showTime(currentTime, render, SCREEN_WIDTH, SCREEN_HEIGHT); 
+            // Times Up 
+            if (newTime == 0) {
+                timer.stop();
+                Text click(render, _NORMAL, { 255, 255, 255 }, 48, SCREEN_WIDTH - 50);
+                click.loadFromRenderedText("TIME IS UP");
+                int clickWidth = click.getWidth();
+                int clickHeight = click.getHeight();
+                int x = (SCREEN_WIDTH - clickWidth) / 2;
+                click.render(x, questionText.getHeight() + 100, clickWidth, clickHeight);
+
+                Text answerDisplay(render, _BOLD, yellow, 48, SCREEN_WIDTH - 50);
+                answerDisplay.loadFromRenderedText(answer);
+                int ansW = answerDisplay.getWidth();
+                int ansH = answerDisplay.getHeight();
+                x = (SCREEN_WIDTH - ansW) / 2;
+                answerDisplay.render(x, questionText.getHeight() + clickHeight + 200, ansW, ansH);
+                SDL_RenderPresent(render);
+                // Wait 3 seconds then return
+                Timer tempTime(5);
+                tempTime.start();
+                while (tempTime.getTime() != 0) {
+                    continue;
+                }
+                tempTime.stop();
+                return { false, player };
             }
         }
     }
-    // timer in top right corner counting down from 30 seconds
-    // render Text that says "Show Answer"
-    // if timer = 0 OR Text pressed DISPLAY ANSWER in place of Text
-    // new Text appears with a check or X 
-    // if check Text pressed, return true
-    // if x Text pressed, return false
+}
+
+void displayPlayerScores(int playerAmt, int scores[2], SDL_Renderer* render, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+    SDL_SetRenderDrawColor(render, blue[0], blue[1], blue[2], 255);
+    SDL_RenderClear(render);
+
+    Text player(render, _NORMAL, yellow, 24, SCREEN_WIDTH);
+    player.loadFromRenderedText("Player 1: $" + to_string(scores[0]));
+    player.render(0, 0);
+    int height = player.getHeight();
+    if (playerAmt == 2) {
+        player.loadFromRenderedText("Player 2: $" + to_string(scores[1]));
+        player.render(0, height + 20);
+    }
+    SDL_RenderPresent(render);
 }
 
 int main(int argc, char* args[]) {
@@ -213,19 +280,24 @@ int main(int argc, char* args[]) {
     int points[5] = { 200, 400, 600, 800, 1000 };
     bool quit = false;
     // Start Window
-    Window wdw("Play Jeopardy");
+    Window wdw("Play Jeopardy", 1000, 600, 0, 30);
     int SCREEN_WIDTH = wdw.getWidth();
     int SCREEN_HEIGHT = wdw.getHeight();
-    SDL_Renderer* render = wdw.getRenderer();
-    /* 
+    SDL_Renderer* render = wdw.getRenderer(); 
+    // Start Players Window
+    Window playersWdw("Players", 200, 200, 1025, 50);
+    int PLAYERS_WIDTH = playersWdw.getWidth();
+    int PLAYERS_HEIGHT = playersWdw.getHeight();
+    SDL_Renderer* PLAYERS_RENDER = playersWdw.getRenderer();
     // Render loading screen
-    showLoadingScreen(render, SCREEN_WIDTH, SCREEN_HEIGHT);
-     */
+    int players = showLoadingScreen(render, SCREEN_WIDTH, SCREEN_HEIGHT);
+    displayPlayerScores(players, scores, PLAYERS_RENDER, PLAYERS_WIDTH, PLAYERS_HEIGHT);
     // Render Inital Rectangles
     showRectangles(render, SCREEN_WIDTH, SCREEN_HEIGHT, data.categoryName);
     // Set Up Event Handling
     SDL_Event e;
-    while (!quit) {        while (SDL_PollEvent(&e) != 0) {
+    while (!quit) {        
+        while (SDL_PollEvent(&e) != 0) {
             // EXIT PROGRAM
             if (e.type == SDL_QUIT) { 
                 quit = true; 
@@ -248,20 +320,17 @@ int main(int argc, char* args[]) {
                     int difficulty = difficulties[v];
                     tuple<string, string> info = data.getQuestion(category, difficulty);
 
-                    bool correct = showQuestion(get<0>(info), get<1>(info),render, SCREEN_WIDTH,SCREEN_HEIGHT);
-                    if (correct) {
-                        scores[0] += points[v];
+                    tuple<bool, int> correct = showQuestion(get<0>(info), get<1>(info),render, SCREEN_WIDTH,SCREEN_HEIGHT, players);
+                    bool c = get<0>(correct);
+                    bool p = get<1>(correct);
+                    if (c) {
+                        scores[p] += points[v];
                     }
-                    cout << "points: " << scores[0] << endl;
+                    displayPlayerScores(players, scores, PLAYERS_RENDER, PLAYERS_WIDTH, PLAYERS_HEIGHT);
                     showRectangles(render, SCREEN_WIDTH, SCREEN_HEIGHT, data.categoryName);
-                    
                 }
             }
         }
     }
 	return 0;
 };
-
-// 1-3 players. 
-// side screen shows player1,2,3 and their points. 
-// two winning screens at end based on single vs multiplayer

@@ -1,7 +1,9 @@
 #include "window.h"
 
-Window::Window(const char* name) {
-    gWindow = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+Window::Window(const char* name, int width, int height, int x, int y) {
+    SCREEN_WIDTH = width;
+    SCREEN_HEIGHT = height;
+    gWindow = SDL_CreateWindow(name, x, y, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (gWindow == NULL) { cout << "Window could not be created! SDL_Error: " << SDL_GetError() << endl;}
     else {
         gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);

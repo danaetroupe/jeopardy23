@@ -14,3 +14,12 @@ Rectangle::~Rectangle() {
 	x = 0;
 	y = 0;
 }
+
+bool Rectangle::checkCoords(int xpos, int ypos) {
+	if (xpos >= x && xpos <= x + width && ypos >= y && ypos <= y + height) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
